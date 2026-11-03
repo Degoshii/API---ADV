@@ -1,0 +1,204 @@
+<!-- Formulário de contratação — cole dentro de uma página do site.
+     Troque API_URL pelo endereço público da sua API (ex.: https://api.georgereis.adv.br/api/clientes).
+     A validação aqui é só para ajudar o usuário; a validação que vale é a do servidor. -->
+<form id="form-cliente" novalidate autocomplete="on">
+  <fieldset>
+    <legend>Dados pessoais</legend>
+
+    <label>Nome completo *
+      <input name="nome" required minlength="5" maxlength="120" autocomplete="name"
+             pattern="[A-Za-zÀ-ÖØ-öø-ÿ'’.\- ]+" title="Use apenas letras e espaços">
+    </label>
+
+    <label>Nacionalidade *
+      <input name="nacionalidade" required maxlength="80" value="brasileiro(a)">
+    </label>
+
+    <label>Sexo *
+      <select name="sexo" required>
+        <option value="">Selecione</option>
+        <option>Masculino</option>
+        <option>Feminino</option>
+      </select>
+    </label>
+
+    <label>Estado civil *
+      <select name="estado_civil" required>
+        <option value="">Selecione</option>
+        <option>Solteiro(a)</option>
+        <option>Casado(a)</option>
+        <option>União estável</option>
+        <option>Divorciado(a)</option>
+        <option>Viúvo(a)</option>
+        <option>Separado(a)</option>
+      </select>
+    </label>
+
+    <label>Profissão *
+      <input name="profissao" required maxlength="80">
+    </label>
+
+    <label>Está empregado(a)? *
+      <select name="empregado" required>
+        <option value="">Selecione</option>
+        <option>Sim</option>
+        <option>Não</option>
+      </select>
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Documentos</legend>
+
+    <label>RG (número) *
+      <input name="rg" required maxlength="20" pattern="[0-9A-Za-z.\-/ ]{5,20}">
+    </label>
+
+    <label>Órgão emissor do RG * <small>(ex.: SSP/SP)</small>
+      <input name="orgao_emissor" required maxlength="15" pattern="[A-Za-z]{2,10}(/[A-Za-z]{2})?"
+             title="Ex.: SSP/SP">
+    </label>
+
+    <label>CPF *
+      <input name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"
+             pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}">
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Endereço</legend>
+
+    <label>CEP *
+      <input name="cep" required inputmode="numeric" maxlength="9" placeholder="00000-000"
+             pattern="\d{5}-?\d{3}" autocomplete="postal-code">
+    </label>
+
+    <label>Rua *
+      <input name="rua" required maxlength="120" autocomplete="address-line1">
+    </label>
+
+    <label>Número * <small>(ou S/N)</small>
+      <input name="numero" required maxlength="10" pattern="(?:[Ss]/?[Nn]|\d{1,6}[A-Za-z]?)">
+    </label>
+
+    <label>Bairro *
+      <input name="bairro" required maxlength="80">
+    </label>
+
+    <label>Cidade *
+      <input name="cidade" required maxlength="80" autocomplete="address-level2">
+    </label>
+
+    <label>UF *
+      <select name="uf" required>
+        <option value="">UF</option>
+        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+        <option>SP</option><option>SE</option><option>TO</option>
+      </select>
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Contato</legend>
+
+    <label>Telefone / WhatsApp *
+      <input name="telefone" type="tel" required inputmode="tel" maxlength="16"
+             placeholder="(00) 00000-0000" autocomplete="tel">
+    </label>
+
+    <label>E-mail <small>(opcional)</small>
+      <input name="email" type="email" maxlength="120" autocomplete="email">
+    </label>
+  </fieldset>
+
+  <!-- Honeypot: invisível para pessoas; robôs costumam preencher -->
+  <div style="position:absolute;left:-9999px" aria-hidden="true">
+    <label>Não preencha <input name="website" tabindex="-1" autocomplete="off"></label>
+  </div>
+
+  <label>
+    <input type="checkbox" name="consentimento" required>
+    Li a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o
+    tratamento dos meus dados pessoais para análise do meu caso e elaboração do contrato. *
+  </label>
+
+  <button type="submit">Enviar</button>
+  <p id="form-msg" role="status" aria-live="polite"></p>
+</form>
+
+<script>
+(function () {
+  const API_URL = "https://SEU-ENDERECO-DA-API/api/clientes";   // <-- TROQUE AQUI
+  const form = document.getElementById("form-cliente");
+  const msg = document.getElementById("form-msg");
+  const btn = form.querySelector("button[type=submit]");
+
+  // Máscaras simples
+  const so = v => v.replace(/\D/g, "");
+  form.cpf.addEventListener("input", e => {
+    const d = so(e.target.value).slice(0, 11);
+    e.target.value = d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  });
+  form.cep.addEventListener("input", e => {
+    const d = so(e.target.value).slice(0, 8);
+    e.target.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+  });
+  form.telefone.addEventListener("input", e => {
+    const d = so(e.target.value).slice(0, 11);
+    e.target.value = d.length > 10 ? `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`
+                   : d.length > 6  ? `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`
+                   : d.length > 2  ? `(${d.slice(0,2)}) ${d.slice(2)}` : d;
+  });
+
+  function mostrarErros(erros) {
+    form.querySelectorAll("[aria-invalid]").forEach(el => el.removeAttribute("aria-invalid"));
+    const lista = [];
+    for (const [campo, texto] of Object.entries(erros || {})) {
+      const el = form.elements[campo];
+      if (el) el.setAttribute("aria-invalid", "true");
+      lista.push(texto);
+    }
+    msg.textContent = lista.length ? "Corrija: " + lista.join(" ") : "Não foi possível enviar. Tente novamente.";
+  }
+
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    msg.textContent = "";
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    const dados = {};
+    new FormData(form).forEach((v, k) => { dados[k] = typeof v === "string" ? v.trim() : v; });
+    dados.consentimento = form.consentimento.checked;
+    if (!dados.email) delete dados.email;
+
+    btn.disabled = true;
+    try {
+      const r = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) {
+        form.reset();
+        msg.textContent = "Dados enviados com sucesso. Entraremos em contato em breve.";
+      } else if (r.status === 422) {
+        mostrarErros(j.erros);
+      } else if (r.status === 429) {
+        msg.textContent = "Muitas tentativas. Aguarde alguns minutos e tente de novo.";
+      } else {
+        msg.textContent = "Erro no envio. Tente novamente ou fale pelo WhatsApp.";
+      }
+    } catch (e) {
+      msg.textContent = "Sem conexão com o servidor. Tente novamente.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>

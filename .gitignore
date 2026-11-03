@@ -1,0 +1,4 @@
+.env
+clientes.db
+saida/
+__pycache__/
